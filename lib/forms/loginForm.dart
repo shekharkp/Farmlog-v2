@@ -2,6 +2,7 @@ import 'package:farmalog/pages/appbarNavbar.dart';
 import 'package:farmalog/Database_helper/securedStorage.dart';
 import 'package:flutter/material.dart';
 import 'package:farmalog/Database_helper/firestore_helper.dart';
+import 'package:farmalog/Database_helper/languages.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -12,6 +13,7 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
 
+  final language = Language();
   final storage = Securedstorage();
   final TextEditingController _userid = TextEditingController();
   final TextEditingController _password = TextEditingController();
@@ -25,12 +27,12 @@ class _LoginFormState extends State<LoginForm> {
           width: 200,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(14),
             color: const Color(0xffe4e2e5),),
-          child: const Column(
+          child:  Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircularProgressIndicator(color: Color(0xFF333c3a)),
               SizedBox(height: 10),
-              Text("  Processing...", style: TextStyle(fontSize: 12,
+              Text("  ${language.setText("processing")}", style: TextStyle(fontSize: 12,
                   color: Color(0xFF333c3a),
                   fontWeight: FontWeight.bold),),
             ],
@@ -40,11 +42,26 @@ class _LoginFormState extends State<LoginForm> {
     },);
   }
 
+
   @override
   void dispose() {
     _userid.dispose();
     _password.dispose();
     super.dispose();
+  }
+
+  getLanguageForText()async
+  {
+    await language.getLanguage();
+    setState(() {
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getLanguageForText();
   }
 
 
@@ -73,9 +90,9 @@ class _LoginFormState extends State<LoginForm> {
               ),
               child: Column(
                 children: [
-                  const Text(
-                    "Login",
-                    style: TextStyle(
+                   Text(
+                    language.setText("login"),
+                    style:const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF333c3a),
@@ -88,8 +105,8 @@ class _LoginFormState extends State<LoginForm> {
                     key: _formkey,
                     child: Column(
                       children: [
-                        FormTextFields(Title: "User ID",maxlength: 15,controller: _userid,),
-                        FormTextFields(Title: "Password",maxlength: 15,controller: _password,),
+                        FormTextFields(Title: language.setText("userid"),maxlength: 15,controller: _userid,),
+                        FormTextFields(Title: language.setText("password"),maxlength: 15,controller: _password,),
                         const SizedBox(
                           height: 10,
                         ),
@@ -126,7 +143,7 @@ class _LoginFormState extends State<LoginForm> {
                             backgroundColor:const MaterialStatePropertyAll(Color(0xFF333c3a))
                           ),
                           icon:const Icon(Icons.login_rounded),
-                          label:const Text("Login"),
+                          label:Text(language.setText("login")),
                         ),
                       ],
                     ),

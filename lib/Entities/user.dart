@@ -2,6 +2,7 @@ class User{
   String userid;
   String username;
   String gender;
+  String role;
   int mobileNo;
   String password;
 
@@ -11,6 +12,7 @@ class User{
       this.gender,
       this.mobileNo,
       this.password,
+      this.role
       );
 
 
@@ -20,6 +22,7 @@ class User{
       'username' : username,
       'userid' : userid,
       'gender' : gender,
+      'role' : role,
       'mobileNo' : mobileNo,
       'password' : password
     };

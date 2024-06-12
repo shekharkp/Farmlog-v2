@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1082482597138",
+    "project_id": "farmlog-5a1b3",
+    "storage_bucket": "farmlog-5a1b3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1082482597138:android:0013d5b44fca9801d1a7cb",
+        "android_client_info": {
+          "package_name": "com.example.farmalog"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmv3rIaA-11hRMz1UwWOrzwp6YtGDnYjI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

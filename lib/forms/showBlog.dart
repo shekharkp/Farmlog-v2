@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:farmalog/Database_helper/languages.dart';
 
-class ShowBlog extends StatelessWidget {
+class ShowBlog extends StatefulWidget {
   const ShowBlog(
       {super.key,
       required this.imageProvider,
@@ -11,6 +12,28 @@ class ShowBlog extends StatelessWidget {
   final String title;
   final String content;
   final String author;
+
+  @override
+  State<ShowBlog> createState() => _ShowBlogState();
+}
+
+class _ShowBlogState extends State<ShowBlog> {
+  
+  final language = Language();
+
+  getLanguageForText()async
+  {
+    await language.getLanguage();
+    setState(() {
+    });
+  }
+  
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getLanguageForText();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +46,7 @@ class ShowBlog extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  widget.title,
                   style:const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -32,7 +55,7 @@ class ShowBlog extends StatelessWidget {
                 const SizedBox(
                   height: 5,
                 ),
-                Text("by $author", style:const TextStyle(color: Colors.grey)),
+                Text("${language.setText("by")} ${widget.author}", style:const TextStyle(color: Colors.grey)),
                 const Divider(
                   color: Colors.grey,
                   thickness: 2,
@@ -49,14 +72,14 @@ class ShowBlog extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       image: DecorationImage(
-                        image: imageProvider,
+                        image: widget.imageProvider,
                         fit: BoxFit.cover,
                         opacity: 1,
                       ),
                     ),
                   ),
                 ),
-                SelectableText(content,
+                SelectableText(widget.content,
                     style:const TextStyle(
                       color: Colors.black87,
 

@@ -8,6 +8,8 @@ import '../Database_helper/firestore_helper.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:farmalog/Entities/user.dart';
 import '../Entities/blog.dart';
+import 'package:farmalog/pages/searchBar.dart';
+import 'package:farmalog/Database_helper/languages.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -17,6 +19,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
+  final language = Language();
   final Securedstorage _securedstorage = Securedstorage();
   final Firestore_helper _firestore_helper = Firestore_helper();
 
@@ -50,6 +53,20 @@ class _HomeState extends State<Home> {
     return Comment;
   }
 
+  getLanguageForText()async
+  {
+    await language.getLanguage();
+    setState(() {
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getLanguageForText();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +80,8 @@ class _HomeState extends State<Home> {
       child: Scaffold(
         backgroundColor: Color(0xffe4e2e5),
         body: SingleChildScrollView(
-          child: Column(
+          child:
+          Column(
             children: [
               Padding(
                 padding: const EdgeInsets.only(
@@ -78,8 +96,8 @@ class _HomeState extends State<Home> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Welcome,",
+                         Text(
+                          language.setText("welcome"),
                           style: TextStyle(
                               color: Colors.grey,
                               fontSize: 20,
@@ -123,6 +141,22 @@ class _HomeState extends State<Home> {
                         },
                         ),
                       ],
+                    ),
+                    Expanded(child: SizedBox(width: 1,),),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SearchBarPage(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.search_rounded,
+                        size: 25,
+                        color: Color(0xFF333c3a),
+                      ),
                     ),
                     IconButton(
                       onPressed: () {
@@ -214,7 +248,7 @@ class _HomeState extends State<Home> {
                                       Align(
                                         alignment: Alignment.centerLeft,
                                         child: Text(
-                                          "by ${snapshot.data![index].userid}",
+                                          "${language.setText("by")} ${snapshot.data![index].userid}",
                                           maxLines: 1,
                                           style:const TextStyle(
                                               color: Color(0xFF333c3a),
@@ -255,9 +289,9 @@ class _HomeState extends State<Home> {
                                                        Container(
                                                          padding:const EdgeInsets
                                                              .all(10),
-                                                         child:const Text(
-                                                           "Q&A",
-                                                           style: TextStyle(
+                                                         child:Text(
+                                                           language.setText("feedback"),
+                                                           style:const TextStyle(
                                                                fontSize: 20,
                                                                fontWeight: FontWeight
                                                                    .bold,
@@ -377,10 +411,10 @@ class _HomeState extends State<Home> {
                                                                    keyboardType:
                                                                    TextInputType
                                                                        .text,
-                                                                   decoration:const InputDecoration(
+                                                                   decoration: InputDecoration(
                                                                        counterText: '',
                                                                        hintText:
-                                                                       "add a Comment"),
+                                                                       language.setText("add a comment")),
                                                                  ),
                                                                ),
                                                              ),
@@ -462,8 +496,8 @@ class _HomeState extends State<Home> {
                                                 builder: (context) =>
                                                     ShowBlog(title: snapshot.data![index].title,content: snapshot.data![index].content,imageProvider: NetworkImage(snapshot.data![index].imagePath),author: snapshot.data![index].userid),),);
                                           },
-                                          child:const Text(
-                                            "Read More",
+                                          child: Text(
+                                            language.setText("read more"),
                                             style: TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.normal),

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../Database_helper/firestore_helper.dart';
 import 'package:farmalog/Entities/user.dart';
 import 'package:farmalog/Database_helper/securedStorage.dart';
+import 'package:farmalog/Database_helper/languages.dart';
 
 class EditProfileForm extends StatefulWidget {
   const EditProfileForm({super.key});
@@ -29,12 +30,12 @@ class _EditProfileFormState extends State<EditProfileForm> {
           width: 200,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(14),
             color: const Color(0xffe4e2e5),),
-          child: const Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircularProgressIndicator(color: Color(0xFF333c3a)),
               SizedBox(height: 10),
-              Text("  Processing...", style: TextStyle(fontSize: 12,
+              Text("  ${language.setText("processing")}", style: TextStyle(fontSize: 12,
                   color: Color(0xFF333c3a),
                   fontWeight: FontWeight.bold),),
             ],
@@ -44,10 +45,25 @@ class _EditProfileFormState extends State<EditProfileForm> {
     },);
   }
 
+  final language = Language();
   final TextEditingController _username = TextEditingController();
   final TextEditingController _mobileno = TextEditingController();
   final TextEditingController _password = TextEditingController();
   final _formkey = GlobalKey<FormState>();
+
+  getLanguageForText()async
+  {
+    await language.getLanguage();
+    setState(() {
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getLanguageForText();
+  }
 
   @override
   void dispose() {
@@ -82,9 +98,9 @@ class _EditProfileFormState extends State<EditProfileForm> {
                   ]),
               child: Column(
                 children: [
-                  const Text(
-                    "Profile",
-                    style: TextStyle(
+                   Text(
+                    language.setText("profile"),
+                    style:const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF333c3a)),
@@ -112,17 +128,17 @@ class _EditProfileFormState extends State<EditProfileForm> {
                               return Column(
                                 children: [
                                   FormTextFields(
-                                      Title: "Username",
+                                      Title: language.setText("username"),
                                       maxlength: 25,
                                       controller: _username),
                                   FormTextFields(
-                                    Title: "Mobile Number",
+                                    Title: language.setText("phone number"),
                                     maxlength: 10,
                                     controller: _mobileno,
                                     keyboadtype: TextInputType.phone,
                                   ),
                                   FormTextFields(
-                                    Title: "Password",
+                                    Title: language.setText("password"),
                                     controller: _password,
                                     maxlength: 15,
                                   ),
@@ -150,7 +166,7 @@ class _EditProfileFormState extends State<EditProfileForm> {
                               backgroundColor:
                                  const MaterialStatePropertyAll(Color(0xFF333c3a),),),
                           icon:const Icon(Icons.save_rounded),
-                          label:const Text("Save"),
+                          label:Text(language.setText("save")),
                           onPressed: () async {
                             if(_formkey.currentState!.validate())
                               {
@@ -162,7 +178,7 @@ class _EditProfileFormState extends State<EditProfileForm> {
                                 LoadingScreen();
                                 String userID = await storage.getuserID();
                                 User getuser = await firestore_helper.getUserByID(userID);
-                                User user = User(getuser.userid, _username.text, getuser.gender, int.parse(_mobileno.text), _password.text);
+                                User user = User(getuser.userid, _username.text, getuser.gender, int.parse(_mobileno.text), _password.text,getuser.role);
                                 firestore_helper.Updateuser(user);
                                 Navigator.of(context).pop(context);
                                 Navigator.of(context).pop(context);

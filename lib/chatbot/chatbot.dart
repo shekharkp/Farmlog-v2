@@ -1,8 +1,6 @@
-
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'chatbotapi.dart';
+import 'package:farmalog/Database_helper/languages.dart';
 
 class Chatbot extends StatefulWidget {
   const Chatbot({super.key});
@@ -12,9 +10,12 @@ class Chatbot extends StatefulWidget {
 }
 
 class _ChatbotState extends State<Chatbot> {
+  
+  final language = Language();
   List<Message> msg = [Message('r', "Hello, How can i help?"),];
   final TextEditingController _chatbot_controller = TextEditingController();
-
+  
+  
   void sendMessage(String message)
   {
     msg.add(Message("s", message),);
@@ -45,6 +46,20 @@ class _ChatbotState extends State<Chatbot> {
 
   }
 
+  getLanguageForText()async
+  {
+    await language.getLanguage();
+    setState(() {
+    });
+  }
+  
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getLanguageForText();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +69,7 @@ class _ChatbotState extends State<Chatbot> {
         appBar: AppBar(
           backgroundColor:const Color(0xffe4e2e5),
           automaticallyImplyLeading: false,
-          title:const Text('Chatbot',style: TextStyle(color: Color(0xFF333c3a),fontWeight: FontWeight.bold,fontSize: 25),),
+          title: Text(language.setText("chatbot"),style: TextStyle(color: Color(0xFF333c3a),fontWeight: FontWeight.bold,fontSize: 25),),
           centerTitle: true,
           elevation: 0,
         ),
@@ -110,7 +125,7 @@ class _ChatbotState extends State<Chatbot> {
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
-                          hintText: "Enter Message",
+                          hintText: language.setText("enter message"),
                           contentPadding:
                               const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                           border: OutlineInputBorder(

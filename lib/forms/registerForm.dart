@@ -2,6 +2,7 @@ import 'loginForm.dart';
 import 'package:flutter/material.dart';
 import 'package:farmalog/Entities/user.dart';
 import '../Database_helper/firestore_helper.dart';
+import 'package:farmalog/Database_helper/languages.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
@@ -11,11 +12,14 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> {
+
+  Language language = Language();
   final TextEditingController _name = TextEditingController();
   final TextEditingController _id = TextEditingController();
   final TextEditingController _mobileNo = TextEditingController();
   final TextEditingController _password = TextEditingController();
   String Gender = "Male";
+  String Role = "Blogger";
   final _registerFormKey = GlobalKey<FormState>();
 
 
@@ -32,12 +36,12 @@ class _RegisterFormState extends State<RegisterForm> {
           width: 200,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(14),
             color: const Color(0xffe4e2e5),),
-          child: const Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircularProgressIndicator(color: Color(0xFF333c3a)),
               SizedBox(height: 10),
-              Text("  Processing...", style: TextStyle(fontSize: 12,
+              Text("  ${language.setText("processing")}", style: TextStyle(fontSize: 12,
                   color: Color(0xFF333c3a),
                   fontWeight: FontWeight.bold),),
             ],
@@ -90,6 +94,20 @@ class _RegisterFormState extends State<RegisterForm> {
     super.dispose();
   }
 
+  getLanguageForText()async
+  {
+    await language.getLanguage();
+    setState(() {
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getLanguageForText();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,9 +132,9 @@ class _RegisterFormState extends State<RegisterForm> {
                   ]),
               child: Column(
                 children: [
-                  const Text(
-                    "Register",
-                    style: TextStyle(
+                   Text(
+                    language.setText("register"),
+                    style:const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF333c3a)),
@@ -128,10 +146,10 @@ class _RegisterFormState extends State<RegisterForm> {
                     key: _registerFormKey,
                     child: Column(
                       children: [
-                        FormTextFields(Title: "Username",controller: _name,maxlength: 25,),
-                        FormTextFields(Title: "User ID",controller: _id,maxlength: 15,),
-                        const Text(
-                          "Gender",
+                        FormTextFields(Title: language.setText("username"),controller: _name,maxlength: 25,),
+                        FormTextFields(Title: language.setText("userid"),controller: _id,maxlength: 15,),
+                        Text(
+                          language.setText("gender"),
                           style: TextStyle(
                               color: Colors.grey, fontSize: 15, fontWeight: FontWeight.bold),
                         ),
@@ -144,7 +162,7 @@ class _RegisterFormState extends State<RegisterForm> {
                                 value: "Male",
                                 groupValue: Gender,
                                 activeColor:const Color(0xFF333c3a),
-                                title:const Text("Male",style: TextStyle(color: Color(0xFF333c3a),),),
+                                title:Text(language.setText("male"),style:const TextStyle(color: Color(0xFF333c3a),),),
                                 onChanged: (value) {
                                   setState(() {
                                     Gender = value.toString();
@@ -158,7 +176,7 @@ class _RegisterFormState extends State<RegisterForm> {
                                 value: "Female",
                                 groupValue: Gender,
                                 activeColor: Color(0xFF333c3a),
-                                title: Text("Female",style: TextStyle(color: Color(0xFF333c3a),),),
+                                title: Text(language.setText("female"),style: TextStyle(color: Color(0xFF333c3a),),),
                                 onChanged: (value) {
                                   setState(() {
                                     Gender = value.toString();
@@ -169,14 +187,53 @@ class _RegisterFormState extends State<RegisterForm> {
                             ),
                           ],
                         ),
-                        FormTextFields(
-                          Title: "Phone Number",
-                          controller: _mobileNo,
-                          maxlength: 10,
-                          keyboadtype: TextInputType.phone,
+                         Text(
+                          language.setText("role"),
+                          style:const TextStyle(
+                              color: Colors.grey, fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              fit: FlexFit.loose,
+                              child: RadioListTile(
+                                value: "Blogger",
+                                groupValue: Role,
+                                activeColor:const Color(0xFF333c3a),
+                                title:Text(language.setText("blogger"),style: TextStyle(color: Color(0xFF333c3a),),),
+                                onChanged: (value) {
+                                  setState(() {
+                                    Gender = value.toString();
+                                  });
+                                },
+                              ),
+                            ),
+                            Flexible(
+                              fit: FlexFit.loose,
+                              child: RadioListTile(
+                                value: "Event Organiser",
+                                groupValue: Role,
+                                activeColor: Color(0xFF333c3a),
+                                title: Text(language.setText("event organiser"),style: TextStyle(color: Color(0xFF333c3a),),),
+                                onChanged: (value) {
+                                  setState(() {
+                                    Role = value.toString();
+                                  },
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         ),
                         FormTextFields(
-                            Title: "Password",
+                          Title: language.setText("phone number"),
+                          controller: _mobileNo,
+                          maxlength: 10,
+                          keyboadtype: TextInputType.number,
+                        ),
+                        FormTextFields(
+                            Title: language.setText("password"),
                             controller: _password,
                             maxlength: 15,
                         ),
@@ -198,7 +255,7 @@ class _RegisterFormState extends State<RegisterForm> {
                               return;
                             }
                             else{
-                              User user = User(_id.text, _name.text, Gender, int.parse(_mobileNo.text), _password.text);
+                              User user = User(_id.text, _name.text, Gender, int.parse(_mobileNo.text), _password.text, Role);
                               Firestore_helper firestore_helper = Firestore_helper();
 
                               if(await isUserIDAlreadyExist(user,firestore_helper))
@@ -223,7 +280,7 @@ class _RegisterFormState extends State<RegisterForm> {
                         backgroundColor:const MaterialStatePropertyAll(Color(0xFF333c3a))
                       ),
                       icon:const Icon(Icons.app_registration_rounded),
-                      label:const Text("Register"),
+                      label:Text(language.setText("register")),
                     ),
                       ],
                     ),
@@ -244,7 +301,7 @@ class Backgroundcolour extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color:const Color(0xFFc4cfdd),
+      color: const Color(0xFFc4cfdd),
       width: double.maxFinite,
       height: 500,
       alignment: Alignment.topCenter,

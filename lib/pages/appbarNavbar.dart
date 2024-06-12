@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:farmalog/pages/home.dart';
+import 'package:farmalog/pages/events.dart';
 import 'package:farmalog/chatbot/chatbot.dart';
+import 'package:farmalog/pages/community.dart';
 import 'profile.dart';
+import 'package:farmalog/Database_helper/languages.dart';
 
 class appbarNavbar extends StatefulWidget {
   const appbarNavbar({super.key});
@@ -12,8 +15,24 @@ class appbarNavbar extends StatefulWidget {
 }
 
 class _appbarNavbarState extends State<appbarNavbar> {
-  List<Widget> Pages = [const Home(), const Chatbot(), const Profile()];
+  
+  Language language = Language();
+  List<Widget> Pages = [const Home(), const Community(), const Chatbot(), const Events(), const Profile()];
   int index = 0;
+
+  getLanguageForText()async
+  {
+    await language.getLanguage();
+    setState(() {
+    });
+  }
+  
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getLanguageForText();
+  }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -92,7 +111,7 @@ class _appbarNavbarState extends State<appbarNavbar> {
                   },
                 );
               },
-              items: const [
+              items:  [
                 BottomNavigationBarItem(
                   icon: Icon(
                     Icons.home_outlined,
@@ -100,22 +119,32 @@ class _appbarNavbarState extends State<appbarNavbar> {
                   activeIcon: Icon(
                     Icons.home_rounded,
                   ),
-                  label: "Home",
+                  label: language.setText("home"),
+                ),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.question_answer_outlined),
+                  activeIcon: Icon(Icons.question_answer_rounded),
+                  label: language.setText("community")
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(
                     Icons.chat_bubble_outline_rounded,
                   ),
-                  label: "Chatbot",
+                  label: language.setText("chatbot"),
                   activeIcon: Icon(
                     Icons.chat_bubble_rounded,
                   ),
                 ),
                 BottomNavigationBarItem(
+                    icon: Icon(Icons.storefront_outlined),
+                    activeIcon: Icon(Icons.storefront_rounded),
+                    label: language.setText("events")
+                ),
+                BottomNavigationBarItem(
                   icon: Icon(
                     Icons.person_outline_rounded,
                   ),
-                  label: "Profile",
+                  label: language.setText("profile"),
                   activeIcon: Icon(
                     Icons.person,
                   ),

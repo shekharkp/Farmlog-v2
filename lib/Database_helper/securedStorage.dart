@@ -39,4 +39,19 @@ class Securedstorage
     print(value);
     return value;
   }
+
+    setLanguage(String language) async
+   {
+     await storage.write(key: "language", value: language,aOptions: _securedata,);
+     final value = await storage.read(key: "language",aOptions: _securedata);
+     print("database set language :$value");
+     return value;
+   }
+
+   Future<String> getLanguage() async
+   {
+     final value = await storage.read(key: "language",aOptions: _securedata)?? "Value not found";
+     print("database get language : $value");
+     return value;
+   }
 }

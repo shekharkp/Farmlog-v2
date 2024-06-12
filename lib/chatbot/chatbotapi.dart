@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class Responce {
-  final _apiKey = 'Paste your api key here.';
+  final _apiKey = 'ENTER API KEY HERE';
   final _endpoint = 'https://api.openai.com/v1/chat/completions';
 
     Future<Map<String, dynamic>> sendMessageToChatGPT(message) async {
@@ -25,8 +25,8 @@ class Responce {
       },),
     );
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return data;
+        final data = json.decode(response.body);
+        return data;
     } else {
       throw Exception('Error occured!');
     }

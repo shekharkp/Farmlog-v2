@@ -1,38 +1,38 @@
 import 'dart:io';
+import 'package:farmalog/Entities/event.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:farmalog/Entities/blog.dart';
-import 'package:farmalog/Database_helper/firestore_helper.dart';
-import 'package:farmalog/Database_helper/securedStorage.dart';
-import 'package:farmalog/chatbot/chatbotapi.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:farmalog/Database_helper/languages.dart';
+import 'package:farmalog/Database_helper/securedStorage.dart';
+import 'package:farmalog/Database_helper/firestore_helper.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 
-class CreateBlogForm extends StatefulWidget {
-  const CreateBlogForm({super.key});
+class CreateEventForm extends StatefulWidget {
+  const CreateEventForm({super.key});
 
   @override
-  State<CreateBlogForm> createState() => _CreateBlogFormState();
+  State<CreateEventForm> createState() => _CreateEventFormState();
 }
 
-class _CreateBlogFormState extends State<CreateBlogForm> {
+class _CreateEventFormState extends State<CreateEventForm> {
   File? _image;
-  bool Showcomments = true;
 
   final language = Language();
-  final Securedstorage securedstorage = Securedstorage();
-  final Firestore_helper firestore_helper = Firestore_helper();
-
+  Securedstorage securedstorage = Securedstorage();
+  Firestore_helper firestore_helper = Firestore_helper();
   final TextEditingController _title = TextEditingController();
+  final TextEditingController _date = TextEditingController();
+  final TextEditingController _location = TextEditingController();
+  final TextEditingController _directionLink = TextEditingController();
   final TextEditingController _content = TextEditingController();
-  final GlobalKey<FormState> _createBlogkey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _createEventkey = GlobalKey<FormState>();
 
   showMessage(String message)
   {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message),),);
   }
+
 
   LoadingScreen() {
     return showDialog(context: context,barrierDismissible: false, builder: (context) {
@@ -57,12 +57,15 @@ class _CreateBlogFormState extends State<CreateBlogForm> {
     },);
   }
 
-  Future<String> _createBlogId() async
+
+  Future<String> _createEventId() async
   {
     String userid = await securedstorage.getuserID();
     DateTime dateTime = DateTime.now();
-    return "${userid}_blog_${dateTime}";
+    return "${userid}_Event_${dateTime}";
   }
+
+
 
   _imgFromGallery() async {
     ImagePicker picker = ImagePicker();
@@ -75,12 +78,12 @@ class _CreateBlogFormState extends State<CreateBlogForm> {
   Future<String> uploadAndGetImageUrl() async
   {
     String userid = await securedstorage.getuserID();
-     firebase_storage.Reference storagereferance = firebase_storage.FirebaseStorage.instance.ref().child("images/${userid}_image_${DateTime.now()}");
+    firebase_storage.Reference storagereferance = firebase_storage.FirebaseStorage.instance.ref().child("images/${userid}_image_${DateTime.now()}");
 
-     await storagereferance.putFile(_image!);
+    await storagereferance.putFile(_image!);
 
-     String imgurl = await storagereferance.getDownloadURL();
-     return imgurl;
+    String imgurl = await storagereferance.getDownloadURL();
+    return imgurl;
   }
 
   getLanguageForText()async
@@ -119,7 +122,7 @@ class _CreateBlogFormState extends State<CreateBlogForm> {
                   color:const Color(0xFFc4cfdd),
                   borderRadius: BorderRadius.circular(30)),
               child: Text(
-                language.setText("create blog"),
+                language.setText("events"),
                 style: TextStyle(
                   color: Color(0xFF333c3a),
                   fontSize: 25,
@@ -128,7 +131,7 @@ class _CreateBlogFormState extends State<CreateBlogForm> {
               ),
             ),
             Form(
-              key: _createBlogkey,
+              key: _createEventkey,
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
@@ -136,11 +139,11 @@ class _CreateBlogFormState extends State<CreateBlogForm> {
                   children: [
                     Padding(
                       padding:
-                           EdgeInsets.only(left: 10, top: 10, bottom: 10),
+                      EdgeInsets.only(left: 10, top: 10, bottom: 10),
                       child: Text(
                         language.setText("title"),
                         style:
-                            TextStyle(fontSize: 15, color: Color(0xFF333c3a)),
+                        TextStyle(fontSize: 15, color: Color(0xFF333c3a)),
                       ),
                     ),
                     TextFormField(
@@ -149,9 +152,9 @@ class _CreateBlogFormState extends State<CreateBlogForm> {
                       keyboardType: TextInputType.text,
                       validator: (value) {
                         if(value == null || value.isEmpty)
-                          {
-                            return "This field is required!";
-                          }
+                        {
+                          return "This field is required!";
+                        }
                       },
                       decoration: InputDecoration(
                           border: OutlineInputBorder(
@@ -159,6 +162,101 @@ class _CreateBlogFormState extends State<CreateBlogForm> {
                           ),
                           counterText: '',
                           hintText: language.setText("enter title")),
+                    ),
+                     Padding(
+                      padding:
+                      EdgeInsets.only(left: 10, top: 10, bottom: 10),
+                      child: Text(
+                        language.setText("date"),
+                        style:
+                        TextStyle(fontSize: 15, color: Color(0xFF333c3a)),
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _date,
+                      maxLength: 100,
+                      keyboardType: TextInputType.number,
+                      readOnly: true,
+                      onTap: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(2100)
+                        );
+
+                        if(pickedDate != null)
+                        {
+                          String format = "${pickedDate.day}-${pickedDate.month}-${pickedDate.year}";
+                          setState(() {
+                            _date.text = format;
+                          });
+                        }
+                      },
+                      validator: (value) {
+                        if(value == null || value.isEmpty)
+                        {
+                          return "This field is required!";
+                        }
+                      },
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          counterText: '',
+                          hintText: language.setText("enter date")),
+                    ),
+                    Padding(
+                      padding:
+                      EdgeInsets.only(left: 10, top: 10, bottom: 10),
+                      child: Text(
+                        language.setText("location"),
+                        style:
+                        TextStyle(fontSize: 15, color: Color(0xFF333c3a)),
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _location,
+                      maxLength: 100,
+                      keyboardType: TextInputType.text,
+                      validator: (value) {
+                        if(value == null || value.isEmpty)
+                        {
+                          return "This field is required!";
+                        }
+                      },
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          counterText: '',
+                          hintText: language.setText("location")),
+                    ),
+                     Padding(
+                      padding:
+                      EdgeInsets.only(left: 10, top: 10, bottom: 10),
+                      child: Text(
+                        language.setText("map location hyperlink"),
+                        style:
+                        TextStyle(fontSize: 15, color: Color(0xFF333c3a)),
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _directionLink,
+                      maxLength: 100,
+                      keyboardType: TextInputType.url,
+                      validator: (value) {
+                        if(value == null || value.isEmpty)
+                        {
+                          return "This field is required!";
+                        }
+                      },
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          counterText: '',
+                          hintText: language.setText("enter hyperlink")),
                     ),
                     AspectRatio(
                       aspectRatio: 1 / 0.8,
@@ -206,7 +304,7 @@ class _CreateBlogFormState extends State<CreateBlogForm> {
                         },
                       ),
                     ),
-                   Padding(
+                     Padding(
                       padding: EdgeInsets.only(left: 10, top: 50),
                       child: Text(
                         language.setText("content"),
@@ -221,7 +319,7 @@ class _CreateBlogFormState extends State<CreateBlogForm> {
                     ),
                     TextFormField(
                       controller: _content,
-                      maxLines: 30,
+                      maxLines: 20,
                       maxLength: 2000,
                       validator: (value) {
                         if(value == null || value.isEmpty)
@@ -237,35 +335,13 @@ class _CreateBlogFormState extends State<CreateBlogForm> {
                           counterText: '',
                           hintText: language.setText("enter content")),
                     ),
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: Showcomments,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(2)),
-                          activeColor:const Color(0xFF333c3a),
-                          onChanged: (value) {
-                            setState(() {
-                              Showcomments = value!;
-                            });
-
-                          },
-                        ),
-                         Text(
-                          language.setText("feedback"),
-                          style: TextStyle(
-                            color: Color(0xFF333c3a),
-                          ),
-                        ),
-                      ],
-                    ),
                     const SizedBox(height: 20),
                     Center(
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 30),
                         child: ElevatedButton.icon(
                           icon:const Icon(Icons.post_add),
-                          label: Text(language.setText("post")),
+                          label:Text(language.setText("post event")),
                           style: ButtonStyle(
                             shape: MaterialStatePropertyAll(
                               RoundedRectangleBorder(
@@ -285,36 +361,19 @@ class _CreateBlogFormState extends State<CreateBlogForm> {
                           ),
                           onPressed: () async {
 
-                            if(_createBlogkey.currentState!.validate())
-                              {
-                                String blogId = await _createBlogId();
-                                String userid = await securedstorage.getuserID();
-                                Responce gptApi = Responce();
-                                if(_image != null)
-                                  {
-                                    LoadingScreen();
-                                    String verifyBlogContent = await gptApi.verifyBlogContent(_content.text.length > 100 ? _content.text.substring(0,100):_content.text);
-                                    if(verifyBlogContent == "True")
-                                      {
-                                        String imgurl = await uploadAndGetImageUrl();
-                                        Blog blog = Blog(blogId, _title.text, _content.text, userid, Showcomments, imgurl);
-                                        firestore_helper.createBlog(blog);
-                                        showMessage("Blog Posted");
-                                        Navigator.of(context).pop();
-                                        Navigator.of(context).pop();
-                                      }
-                                    else
-                                      {
-                                        Navigator.of(context).pop();
-                                        showMessage("Blog Content is not related to Agriculture field.");
-                                      }
+                            if(_createEventkey.currentState!.validate())
+                            {
+                              LoadingScreen();
+                              String eventId = await _createEventId();
+                              String userId = await securedstorage.getuserID();
+                              String imgurl = await uploadAndGetImageUrl();
+                              FarmEvents event = FarmEvents(eventId, userId, _title.text, imgurl, _location.text, _content.text, _date.text, _directionLink.text);
+                              firestore_helper.createEvent(event);
+                              showMessage("Event Posted");
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                            }
 
-                                  }
-                                else
-                                  {
-                                    showMessage("Pick Image from Gallery");
-                                  }
-                              }
                           },
                         ),
                       ),
