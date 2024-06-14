@@ -48,4 +48,4 @@ Farmlog version 2 is designed to be an indispensable tool for farmers, event org
    - [ ] Feedback
    - [ ] Question
    - [ ] Users)
-3. Done 👍
+3. Add openai api key to lib/chatbot/chatbotapi.dart and Done 👍.
